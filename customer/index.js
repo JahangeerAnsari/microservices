@@ -2,8 +2,8 @@ const express = require('express');
 const app = express()
 app.use(express.json());
 app.use('/', (req, res) => {
-   return res.json(200).json({
-        "msg":'Hello from customer'
+    res.status(200).json({
+        message:'Hello from customer'
     })
 })
 app.listen(8001, () => {
