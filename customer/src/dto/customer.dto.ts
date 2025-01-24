@@ -27,6 +27,14 @@ export interface OrderInputs{
   _id: string;
   unit:number
 }
+export interface ProductInputs{
+  _id: string;
+  name: string;
+  description: string
+  price: number;
+  available: boolean;
+  banner:string
+}
 export interface AdressInputs {
   street: string;
   postalCode: string;

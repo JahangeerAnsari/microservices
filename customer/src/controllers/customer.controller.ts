@@ -47,5 +47,28 @@ export class CustomerController {
       next(error);
     }
   };
+  myWishList = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const customer = req.user;
+      const result = await this.customerService.getCustomerWishList(customer);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+  addProductToWishlist = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      
+      const customer = req.user;
+      const result = await this.customerService.addToWishlist(customer, req.body);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export const customerController = new CustomerController();

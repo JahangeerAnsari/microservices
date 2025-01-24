@@ -1,5 +1,5 @@
 import { AuthPayload } from "../dto/Auth.dto";
-import {  AdressInputs, CreateCustomerInputs, CustomerLoginInputs, CustomerPayload } from "../dto/customer.dto";
+import {  AdressInputs, CreateCustomerInputs, CustomerLoginInputs, CustomerPayload, ProductInputs } from "../dto/customer.dto";
 import { CustomerRepository } from "../repository";
 import {
   BadRequestError,
@@ -94,10 +94,56 @@ export class CustomerService {
   }
   async getCustomer(c: AuthPayload | undefined) {
     //  find customer with cid
-    const customer = await this.customerRepository.findCustomer("", c?._id)
-     if (customer) {
-      return customer;
+    const customer = await this.customerRepository.findCustomer("", c?._id);
+    if (customer) {
+      return customer.address;
     }
-      throw new BadRequestError("Customer not present for this id");
+    throw new BadRequestError("Customer not present for this id");
+  }
+  // getCustomerWishList
+  async getCustomerWishList(c: AuthPayload | undefined) {
+    //  find customer with cid
+    const customer = await this.customerRepository.findWishListById(c?._id);
+    if (customer) {
+      return customer.wishlist;
+    }
+    throw new BadRequestError("Unable to get the wishlist");
+  }
+  // add product to wishlist
+  async addToWishlist(c: AuthPayload | undefined, input:ProductInputs)  {
+    const { _id, available, banner, description, name, price } = input;
+    const product = {
+      _id,
+      available,
+      banner,
+      description,
+      name,
+      price,
+    };
+    //  find customer with cid
+    const customer = await this.customerRepository.findWishListById(c?._id);
+    if (customer) {
+      let wishlist = customer.wishlist;
+      if (wishlist.length > 0) {
+        let isExits = false;
+        wishlist.map(item => {
+          if (item._id.toString() === product._id.toString()) {
+            const index = wishlist.indexOf(item);
+            wishlist.splice(index, 1);
+            isExits = true
+            }
+        })
+        if (isExits) {
+           wishlist.push(product)
+         }
+      } else {
+        wishlist.push(product)
+      }
+      customer.wishlist = wishlist;
+      const customerResult = await customer.save();
+      return customerResult.wishlist
+   
+    }
+    throw new BadRequestError("Unable to get the wishlist");
   }
 }

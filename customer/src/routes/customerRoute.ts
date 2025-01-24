@@ -11,5 +11,7 @@ router.post("/signin", customerController.customerSignIn);
 router.use(Authenticate);
  router.post("/address",customerController.customerAddress);
  router.get("/address",customerController.customerById);
+ router.get("/wishlist", customerController.myWishList);
+ router.post("/wishlist", customerController.addProductToWishlist);
 
  export { router as customerRoute };
