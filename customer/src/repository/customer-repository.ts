@@ -20,8 +20,16 @@ export class CustomerRepository {
 
     return newAddress;
   }
-   async findWishListById(id: string | undefined) {
-       const customer = await Customer.findById(id).populate("wishlist");
-       return customer;
+  async findWishListById(id: string | undefined) {
+    const customer = await Customer.findById(id).populate("wishlist");
+    return customer;
+  }
+  async findCustomerCartById(id: string | undefined) {
+    const customer = await Customer.findById(id).populate("cart");
+    return customer;
+  }
+  async findCustomerById(id: string | undefined) {
+    const customer = await Customer.findById(id).populate("cart");
+    return customer;
   }
 }

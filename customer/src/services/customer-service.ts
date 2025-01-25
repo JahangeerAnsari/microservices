@@ -1,5 +1,13 @@
 import { AuthPayload } from "../dto/Auth.dto";
-import {  AdressInputs, CreateCustomerInputs, CustomerLoginInputs, CustomerPayload, ProductInputs } from "../dto/customer.dto";
+import {
+  AdressInputs,
+  CartInputs,
+  CreateCustomerInputs,
+  CustomerLoginInputs,
+  CustomerPayload,
+  OrderInputs,
+  ProductInputs,
+} from "../dto/customer.dto";
 import { CustomerRepository } from "../repository";
 import {
   BadRequestError,
@@ -110,7 +118,7 @@ export class CustomerService {
     throw new BadRequestError("Unable to get the wishlist");
   }
   // add product to wishlist
-  async addToWishlist(c: AuthPayload | undefined, input:ProductInputs)  {
+  async addToWishlist(c: AuthPayload | undefined, input: ProductInputs) {
     const { _id, available, banner, description, name, price } = input;
     const product = {
       _id,
@@ -126,24 +134,115 @@ export class CustomerService {
       let wishlist = customer.wishlist;
       if (wishlist.length > 0) {
         let isExits = false;
-        wishlist.map(item => {
+        wishlist.map((item) => {
           if (item._id.toString() === product._id.toString()) {
             const index = wishlist.indexOf(item);
             wishlist.splice(index, 1);
-            isExits = true
-            }
-        })
+            isExits = true;
+          }
+        });
         if (isExits) {
-           wishlist.push(product)
-         }
+          wishlist.push(product);
+        }
       } else {
-        wishlist.push(product)
+        wishlist.push(product);
       }
       customer.wishlist = wishlist;
       const customerResult = await customer.save();
-      return customerResult.wishlist
-   
+      return customerResult.wishlist;
     }
     throw new BadRequestError("Unable to get the wishlist");
+  }
+  // myCartItems
+  async myCartItems(
+    c: AuthPayload | undefined,
+    input:CartInputs,
+    qty: number,
+    isRemove:boolean
+  ) {
+    //  find customer with cid
+    const { _id, banner, name, price } = input;
+    const customer = await this.customerRepository.findCustomerCartById(c?._id);
+    if (customer) {
+      const cartItem = {
+        product: {
+          _id,
+          banner,
+          name,
+          price,
+        },
+        unit: qty,
+      };
+      let cartItems = customer.cart;
+      if (cartItems.length > 0) {
+        let isExits = false;
+        cartItems.map((item) => {
+          if (item.product._id.toString() === _id.toString()) {
+            if (isRemove) {
+              cartItems.slice(cartItems.indexOf(item), 1);
+            } else {
+              item.unit = qty;
+            }
+            isExits = true;
+          }
+        });
+        if (!isExits) {
+          cartItems.push(cartItem);
+        } else {
+          cartItems.push(cartItem);
+        }
+      }
+      customer.cart = cartItems;
+      return await customer.save();
+    }
+
+    throw new BadRequestError("Unable to get the wishlist");
+  }
+  // ADD_ORDER_TO_CUSTOMER
+  async addOrderToProfile(c: AuthPayload | undefined, order: OrderInputs) {
+    //  find customer with cid
+    const customer = await this.customerRepository.findCustomerById(c?._id);
+    if (customer) {
+      let emptyOrder: any = [];
+      let emptyCart: any = [];
+      if (customer.orders == undefined) {
+        customer.orders = emptyOrder;
+      }
+      // we can push our order to customer orders
+      customer.orders.push(order);
+      // order placed remove from the cart
+      customer.cart = emptyCart;
+      // update the customer profile
+      const updateProfile = await customer.save();
+      return updateProfile;
+    }
+
+    throw new BadRequestError("Unable to get the wishlist");
+  }
+
+  async SubscribeEvents(payload: any) {
+    const { event, data } = payload;
+    const { customerId, product, order, qty } = data;
+    switch (event) {
+      case "ADD_TO_WISHLIST":
+      case "REMOVE_FROM_WISHLIST":
+        this.addToWishlist(customerId, product);
+        break;
+      case "ADD_TO_CART":
+        this.myCartItems(customerId, product, qty, false);
+        break;
+      case "REMOVE_FROM_CART":
+        this.myCartItems(customerId, product, qty, true);
+        break;
+      case "CREATE_ORDER":
+        this.addOrderToProfile(customerId, order);
+        break;
+      case "TEST":
+        console.log("WORKING TEST");
+        break;
+      default:
+        console.log(`Unknown event: ${event}`);
+        break;
+    }
   }
 }

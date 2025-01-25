@@ -13,5 +13,7 @@ router.use(Authenticate);
  router.get("/address",customerController.customerById);
  router.get("/wishlist", customerController.myWishList);
  router.post("/wishlist", customerController.addProductToWishlist);
+ router.post("/cart", customerController.addProductToCart);
+ router.post("/orders", customerController.manageOrder);
 
  export { router as customerRoute };

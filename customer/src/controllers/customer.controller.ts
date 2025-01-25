@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { CustomerService } from "../services/customer-service";
+import { CartInputs } from "../dto/customer.dto";
 export class CustomerController {
   private customerService: CustomerService;
 
@@ -62,13 +63,53 @@ export class CustomerController {
     next: NextFunction
   ) => {
     try {
-      
       const customer = req.user;
-      const result = await this.customerService.addToWishlist(customer, req.body);
+      const result = await this.customerService.addToWishlist(
+        customer,
+        req.body
+      );
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+  //
+  addProductToCart = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const customer = req.user;
+      const { _id, banner, name, price } = <CartInputs>req.body;
+      const input = {
+        _id,
+        banner,
+        name,
+        price,
+      };
+       const {isRemove,qty} = req.body
+      const result = await this.customerService.myCartItems(
+        customer,
+        input,
+        qty,
+        isRemove
+      );
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+  // manageOrder
+  manageOrder = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const customer = req.user;
+      const result = await this.customerService.addOrderToProfile(customer, req.body);
       res.json(result);
     } catch (error) {
       next(error);
     }
   };
 }
+
 export const customerController = new CustomerController();

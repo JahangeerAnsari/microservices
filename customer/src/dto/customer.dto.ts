@@ -35,6 +35,20 @@ export interface ProductInputs{
   available: boolean;
   banner:string
 }
+export interface CartInputs {
+  _id: string;
+  name: string;
+  price: number;
+  banner: string;
+  // qty: number;
+  // isRemove:boolean
+}
+export interface OrderInputs {
+  _id: string;
+  amount: string;
+  date: Date;
+}
+
 export interface AdressInputs {
   street: string;
   postalCode: string;
