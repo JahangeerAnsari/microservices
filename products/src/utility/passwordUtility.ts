@@ -3,6 +3,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { SECRET_KEY } from "../config";
 import { Request } from "express";
 import { AuthPayload } from "../database/dto/Auth.dto";
+import axios from "axios";
 
 export const generateSalt = async () => {
   return await bcrypt.genSalt();
@@ -42,4 +43,10 @@ export const validateSignature = async (req: Request) => {
      }
    }
    return false;
+};
+export const PublishCustomerEvent = async(payload:any) => {
+    axios.post('http://localhost:8000/customer/app-events',{payload});
+}
+export const PublishShoppingEvent = async (payload: any) => {
+  axios.post('http://localhost:8000/shopping/app-events', { payload });
 };

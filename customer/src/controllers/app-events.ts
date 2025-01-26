@@ -8,7 +8,7 @@ export const appEvents = (app:any) => {
     app.use('/app-events', async (req: Request, res: Response, next: NextFunction) => {
         const { payload } = req.body;
        await service.SubscribeEvents(payload);
-        console.log("===================>SubscribeEvents");
+        console.log("===================>Customer Service Events");
         return res.status(200).json(payload)
         
     })
