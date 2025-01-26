@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import  { Application } from "express";
 import bodyParser from "body-parser";
 import { customerRoute } from "../routes";
 import { errorHandler } from "../middlewares";
@@ -8,9 +8,6 @@ export default async (app: Application) => {
   app.use(bodyParser.json());
   // for image file
   app.use(bodyParser.urlencoded({ extended: true }));
-  // app.use("/images", express.static(path.join("photos")));
-  // EVENT LISTENING
-  
   
   appEvents(app);
   console.log("test 1");

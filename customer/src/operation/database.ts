@@ -4,7 +4,7 @@ import { BASE_URL } from "../config";
 export default async () => {
   try {
     await mongoose.connect(BASE_URL).then(() => {
-      console.log(" database connection successful");
+      console.log(" database connection okay successful");
     });
   } catch (error) {
     console.log("error on db connection", error);
